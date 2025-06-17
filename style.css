@@ -1,42 +1,94 @@
 body {
-  font-family: Arial, sans-serif;
-  margin: 2rem;
-  background-color: #f2f2f2;
-  color: #333;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #2c3e50;
+  min-height: 100vh;
 }
 
 main {
-  max-width: 600px;
-  margin: auto;
+  max-width: 800px;
+  margin: 2rem auto;
   background: white;
-  padding: 2rem;
-  border-radius: 8px;
+  padding: 2.5rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+main:hover {
+  transform: translateY(-5px);
 }
 
 form label {
   display: block;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  font-weight: 500;
+  color: #34495e;
 }
 
 input, select {
   width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.3rem;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
 button {
-  padding: 0.7rem 1.2rem;
-  background: #2ecc71;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background: #27ae60;
+  background: linear-gradient(135deg, #2980b9 0%, #2573a7 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #resultado {
   margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+  transition: all 0.3s ease;
+}
+
+/* Animación para elementos que aparecen */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#resultado {
+  animation: fadeIn 0.5s ease-out;
 }
