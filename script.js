@@ -4,7 +4,7 @@ const horasSolPorMunicipio = {
   Valledupar:6.2,
   Aguachica:5.8,
   Codazzi:6.1,
-  La_Jagua_Ibirico:6.0,
+  La_Jagua_de_Ibirico:6.0,
   Bosconia:5.9,
   Chimichagua:6.0,
   Curumaní:5.9,
@@ -42,18 +42,15 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
 
   const tarifa = parseFloat(fila.Tarifa_kWh);
   const horasSol = horasSolPorMunicipio[municipio];
-  const precioVenta = tarifa * 0.8; // pago por excedente: 80% de la tarifa
 
   const energiaGenerada = horasSol * eficienciaPanel * 30; // kWh al mes
   const energiaUtilizada = Math.min(energiaGenerada, consumo);
-  const excedente = Math.max(energiaGenerada - consumo, 0);
 
   const ahorroPorUso = energiaUtilizada * tarifa;
-  const ingresoPorExcedente = excedente * precioVenta;
-  const ahorroTotal = ahorroPorUso + ingresoPorExcedente;
 
   const costoSinPaneles = consumo * tarifa;
   const costoConPaneles = (consumo - energiaUtilizada) * tarifa;
+  const ahorroTotal = ahorroPorUso;
 
   const porcentajeCubierto = (energiaUtilizada / consumo) * 100;
 
@@ -63,22 +60,20 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
 
 - Generarías ${energiaGenerada.toFixed(2)} kWh/mes.
 - Ahorras $${ahorroPorUso.toFixed(0)} COP al reemplazar energía de la red.
-- Vendes ${excedente.toFixed(2)} kWh extra por $${ingresoPorExcedente.toFixed(0)} COP.
-- Tu beneficio total es de $${ahorroTotal.toFixed(0)} COP al mes.
 - Tu nuevo costo mensual sería de $${costoConPaneles.toFixed(0)} COP.
 - Estás cubriendo aproximadamente el ${porcentajeCubierto.toFixed(1)}% de tu consumo.`;
 
-  // Gráfico de barras: comparación económica
+  // Gráfico de barras actualizado
   const ctxBarras = document.getElementById("graficoBarras").getContext("2d");
   if (graficoBarras) graficoBarras.destroy();
   graficoBarras = new Chart(ctxBarras, {
     type: 'bar',
     data: {
-      labels: ['Sin paneles', 'Ahorro por uso', 'Ingreso por excedente'],
+      labels: ['Sin paneles', 'Con paneles', 'Ahorro'],
       datasets: [{
         label: 'Valor en COP',
-        data: [costoSinPaneles, ahorroPorUso, ingresoPorExcedente],
-        backgroundColor: ['#e74c3c', '#2ecc71', '#3498db']
+        data: [costoSinPaneles, costoConPaneles, ahorroTotal],
+        backgroundColor: ['#e74c3c', '#3498db', '#2ecc71']
       }]
     },
     options: {
@@ -97,7 +92,7 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
     }
   });
 
-  // Gráfico pastel: porcentaje de cobertura
+  // Gráfico pastel
   const ctxPastel = document.getElementById("graficoPastel").getContext("2d");
   if (graficoPastel) graficoPastel.destroy();
   graficoPastel = new Chart(ctxPastel, {
