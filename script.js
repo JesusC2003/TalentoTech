@@ -1,12 +1,16 @@
 let datosCSV = [];
 const eficienciaPanel = 0.20; // 20% de eficiencia de los paneles solares
 const horasSolPorMunicipio = {
-  Valledupar: 5.7,
-  Bogotá: 4.5,
-  Medellín: 5.2,
-  Bosconia: 5.8,
-  Barranquilla: 5.9,
-  Santa_Marta: 5.6
+  Valledupar:6.2,
+  Aguachica:5.8,
+  Codazzi:6.1,
+  La_Jagua_Ibirico:6.0,
+  Bosconia:5.9,
+  Chimichagua:6.0,
+  Curumaní:5.9,
+  El_Copey:5.7,
+  Pueblo_Bello:5.7,
+  San_Alberto:6.0
 };
 
 let graficoBarras, graficoPastel;
