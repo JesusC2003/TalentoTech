@@ -1,4 +1,5 @@
-let datosCSV = [];
+document.addEventListener("DOMContentLoaded", () => {
+  let datosCSV = [];
 let datosMunicipios = [];
 let graficoBarras, graficoPastel;
 
@@ -110,6 +111,31 @@ function graficarPastel(energiaUtilizada, consumo) {
   });
 }
 
+function mostrarRecomendaciones(porcentajeCubierto, eficienciaPanel) {
+  const contenedor = document.getElementById("recomendaciones");
+  contenedor.innerHTML = ""; // Limpiar recomendaciones anteriores
+
+  let mensaje = "";
+  if (porcentajeCubierto >= 65) {
+    mensaje += `<p>✅ Excelente rendimiento. Tus paneles cubren gran parte de tu consumo eléctrico.</p>`;
+  } else if (porcentajeCubierto >= 40) {
+    mensaje += `<p>👍 Buen rendimiento. Podrías mejorar con más paneles o mayor eficiencia.</p>`;
+  } else {
+    mensaje += `<p>⚠️ Cobertura baja. Considera ampliar la instalación o revisar orientación de los paneles.</p>`;
+  }
+
+  mensaje += `<p>🛒 Cotiza o compra paneles solares en estas páginas recomendadas:</p>
+  <ul>
+    <li><a href="https://electrysol.com" target="_blank">Electrysol (Colombia)</a></li>
+    <li><a href="https://autecosolar.com" target="_blank">Auteco Solar (Colombia)</a></li>
+    <li><a href="https://shanghaislt.com/products/?gad_source=1&gad_campaignid=22585299066&gclid=CjwKCAjwx8nCBhAwEiwA_z__0-G9Vwr2-mdbdBKV2eNCjlLCCPk7V1J5QP4umlzB4anFhulCacc0iBoCK8sQAvD_BwE" target="_blank">Shanghai SLT (Proveedor internacional)</a></li>
+  </ul>`;
+
+  contenedor.innerHTML = mensaje;
+}
+
+
+
 function manejarFormulario(event) {
   event.preventDefault();
 
@@ -117,6 +143,26 @@ function manejarFormulario(event) {
   const estrato = parseInt(document.getElementById("estrato").value);
   const municipio = document.getElementById("municipio").value;
   const eficienciaPanel = parseFloat(document.getElementById("panel").value);
+
+  if (isNaN(consumo) || consumo <= 0 || consumo > 2000) {
+    alert("Por favor ingresa un consumo mensual válido entre 1 y 2000 kWh.");
+    return;
+  }
+
+  if (isNaN(estrato) || estrato < 1 || estrato > 6) {
+    alert("Por favor selecciona un estrato válido.");
+    return;
+  }
+
+  if (!municipio || municipio.trim() === "") {
+    alert("Por favor selecciona un municipio.");
+    return;
+  }
+
+  if (isNaN(eficienciaPanel) || eficienciaPanel < 0.1 || eficienciaPanel > 0.25) {
+    alert("Por favor selecciona una eficiencia válida de panel.");
+    return;
+  }
 
   const horasSol = obtenerHorasSol(municipio);
   if (horasSol === null) {
@@ -149,12 +195,13 @@ function manejarFormulario(event) {
     porcentajeCubierto,
     costoSinPaneles
   });
-
   graficarBarras(costoSinPaneles, costoConPaneles, ahorroTotal);
   graficarPastel(energiaUtilizada, consumo);
+  mostrarRecomendaciones(porcentajeCubierto, eficienciaPanel);
 }
 
 // Inicialización
 cargarTarifasPorEstrato();
 cargarHorasSolPorMunicipio();
 document.getElementById("formulario").addEventListener("submit", manejarFormulario);
+});
