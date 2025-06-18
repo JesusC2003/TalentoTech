@@ -139,6 +139,7 @@ function mostrarRecomendaciones(porcentajeCubierto, eficienciaPanel) {
 function manejarFormulario(event) {
   event.preventDefault();
 
+  document.querySelector('main').classList.add('results-active');
   const consumo = parseFloat(document.getElementById("consumo").value);
   const estrato = parseInt(document.getElementById("estrato").value);
   const municipio = document.getElementById("municipio").value;
@@ -184,6 +185,8 @@ function manejarFormulario(event) {
   const costoConPaneles = (consumo - energiaUtilizada) * tarifa;
   const ahorroTotal = ahorroPorUso;
   const porcentajeCubierto = (energiaUtilizada / consumo) * 100;
+
+  
 
   mostrarResultados({
     municipio,
