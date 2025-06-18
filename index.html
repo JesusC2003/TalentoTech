@@ -3,19 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simulador de Ahorro Solar</title>
+  <title>Simulador de Ahorro Solar | Energía Sostenible</title>
+  <meta name="description" content="Calcula tu ahorro mensual con paneles solares según tu consumo, estrato y municipio en Colombia">
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="imagen/logo.png">
 </head>
 <body>
-  <main>
-    <h1>Simulador de Ahorro con Paneles Solares</h1>
+  <!-- Partículas flotantes para efecto visual -->
+  <div class="floating-particles">
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 40%; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 8s;"></div>
+    <div class="particle" style="left: 60%; animation-delay: 10s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 12s;"></div>
+    <div class="particle" style="left: 80%; animation-delay: 14s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 16s;"></div>
+  </div>
+
+  <main id="main-container">
+    <!-- Header con logo -->
+    <header class="header">
+      <div class="logo-container">
+        <img src="imagen/logo.png.jpeg" alt="Logo Simulador Solar" class="logo" />
+        <h1>Simulador de Ahorro Solar</h1>
+      </div>
+    </header>
+
+    <!-- Formulario -->
     <form id="formulario">
-      <label>Consumo mensual (kWh): <input type="number" id="consumo" required /></label>
-      <label>Estrato:
-        <select id="estrato" required>
-          <option value="">Seleccione</option>
+      <div class="form-group">
+        <label for="consumo">Consumo mensual (kWh)</label>
+        <input 
+          type="number" 
+          id="consumo" 
+          placeholder="Ej: 350" 
+          min="1" 
+          max="10000" 
+          required 
+          aria-describedby="consumo-help"
+        />
+        <small id="consumo-help" style="color: var(--text-secondary); font-size: 0.8rem;">
+          Revisa tu factura de energía para encontrar este dato
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="estrato">Estrato socioeconómico</label>
+        <select id="estrato" required aria-describedby="estrato-help">
+          <option value="">Seleccione su estrato</option>
           <option value="1">Estrato 1</option>
           <option value="2">Estrato 2</option>
           <option value="3">Estrato 3</option>
@@ -23,43 +63,78 @@
           <option value="5">Estrato 5</option>
           <option value="6">Estrato 6</option>
         </select>
-      </label>
-      <label>Municipio:
-        <select id="municipio" required>
-          <option value="">Seleccione</option>
-            <option value="Valledupar">Valledupar</option>
-            <option value="Aguachica">Aguachica</option>
-            <option value="Codazzi">Codazzi</option>
-            <option value="La Jagua de Ibirico">La Jagua de Ibirico</option>
-            <option value="Bosconia">Bosconia</option>
-            <option value="Chimichagua">Chimichagua</option>
-            <option value="Curumaní">Curumaní</option>
-            <option value="El Copey">El Copey</option>
-            <option value="Pueblo Bello">Pueblo Bello</option>
-            <option value="San Alberto">San Alberto</option>
+        <small id="estrato-help" style="color: var(--text-secondary); font-size: 0.8rem;">
+          El estrato determina la tarifa de energía eléctrica
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="municipio">Municipio de residencia</label>
+        <select id="municipio" required aria-describedby="municipio-help">
+          <option value="">Seleccione su municipio</option>
+          <option value="Valledupar">Valledupar</option>
+          <option value="Aguachica">Aguachica</option>
+          <option value="Codazzi">Codazzi</option>
+          <option value="La_Jagua_Ibirico">La Jagua de Ibirico</option>
+          <option value="Bosconia">Bosconia</option>
+          <option value="Chimichagua">Chimichagua</option>
+          <option value="Curumaní">Curumaní</option>
+          <option value="El_Copey">El Copey</option>
+          <option value="Pueblo Bello">Pueblo Bello</option>
+          <option value="San_Alberto">San Alberto</option>
         </select>
-      </label>
-      <label for="panel">Eficiencia de panel:
-        <select id="panel">
-          <option value="0.15">Estándar (15%)</option>
-          <option value="0.18">Alta eficiencia (18%)</option>
-          <option value="0.20">Premium (20%)</option>
+        <small id="municipio-help" style="color: var(--text-secondary); font-size: 0.8rem;">
+          Cada municipio tiene diferentes horas de sol promedio
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="panel">Tipo de panel solar</label>
+        <select id="panel" aria-describedby="panel-help">
+          <option value="0.15">Estándar (15% eficiencia)</option>
+          <option value="0.18" selected>Alta eficiencia (18% eficiencia)</option>
+          <option value="0.22">Premium (22% eficiencia)</option>
         </select>
-      </label>
-      <button type="submit">Calcular Ahorro</button>
+        <small id="panel-help" style="color: var(--text-secondary); font-size: 0.8rem;">
+          Mayor eficiencia significa más energía por panel
+        </small>
+      </div>
+
+      <button type="submit" id="calcular-btn">
+        <span>Calcular Mi Ahorro</span>
+      </button>
     </form>
 
-    <section id="resultado">
-        <h2>Resultado</h2>
-        <p id="texto-resultado"></p>
+    <!-- Sección de resultados -->
+    <section id="resultado" role="region" aria-labelledby="resultado-titulo">
+      <h2 id="resultado-titulo">Resultados de tu Simulación</h2>
+      
+      <div id="texto-resultado" aria-live="polite"></div>
 
-        <h3>Comparación de costo mensual (COP)</h3>
-        <canvas id="graficoBarras" width="400" height="200"></canvas>
+      <div class="grafico-container">
+        <h3>Comparación de Costos Mensuales (COP)</h3>
+        <canvas 
+          id="graficoBarras" 
+          width="400" 
+          height="200"
+          role="img"
+          aria-label="Gráfico de barras comparando costos sin paneles, con paneles y ahorro total"
+        ></canvas>
+      </div>
 
-        <h3>Porcentaje de consumo cubierto por energía solar</h3>
-        <canvas id="graficoPastel" width="400" height="200"></canvas>
+      <div class="grafico-container">
+        <h3>Cobertura de Consumo por Energía Solar</h3>
+        <canvas 
+          id="graficoPastel" 
+          width="400" 
+          height="200"
+          role="img"
+          aria-label="Gráfico circular mostrando el porcentaje de consumo cubierto por paneles solares"
+        ></canvas>
+      </div>
     </section>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
