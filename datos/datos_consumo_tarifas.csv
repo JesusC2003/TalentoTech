@@ -1,4 +1,7 @@
-Estrato,Consumo_promedio_kWh,Tarifa_kWh,Horas_sol_promedio
-1,100,250,5.2
-2,130,300,5.5
-3,160,350,5.8
+Estrato,Tarifa_kWh
+1,350
+2,444
+3,737
+4,869
+5,1043
+6,1043
