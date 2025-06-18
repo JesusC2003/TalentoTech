@@ -111,17 +111,25 @@ function graficarPastel(energiaUtilizada, consumo) {
   });
 }
 
-function mostrarRecomendaciones(porcentajeCubierto, eficienciaPanel) {
+function mostrarRecomendaciones(porcentajeCubierto, eficienciaPanel, consumo, energiaGenerada) {
   const contenedor = document.getElementById("recomendaciones");
   contenedor.innerHTML = ""; // Limpiar recomendaciones anteriores
 
   let mensaje = "";
+
   if (porcentajeCubierto >= 65) {
     mensaje += `<p>✅ Excelente rendimiento. Tus paneles cubren gran parte de tu consumo eléctrico.</p>`;
   } else if (porcentajeCubierto >= 40) {
     mensaje += `<p>👍 Buen rendimiento. Podrías mejorar con más paneles o mayor eficiencia.</p>`;
   } else {
     mensaje += `<p>⚠️ Cobertura baja. Considera ampliar la instalación o revisar orientación de los paneles.</p>`;
+  }
+
+  if (energiaGenerada > 0) {
+    const panelesNecesarios = Math.ceil(consumo / energiaGenerada);
+    mensaje += `<p>🔋 Para cubrir el 100% de tu consumo mensual, necesitarías aproximadamente <strong>${panelesNecesarios} paneles solares</strong>.</p>`;
+  } else {
+    mensaje += `<p>⚠️ No se pudo calcular el número de paneles necesarios por falta de datos.</p>`;
   }
 
   mensaje += `<p>🛒 Cotiza o compra paneles solares en estas páginas recomendadas:</p>
@@ -133,7 +141,6 @@ function mostrarRecomendaciones(porcentajeCubierto, eficienciaPanel) {
 
   contenedor.innerHTML = mensaje;
 }
-
 
 
 function manejarFormulario(event) {
@@ -186,8 +193,6 @@ function manejarFormulario(event) {
   const ahorroTotal = ahorroPorUso;
   const porcentajeCubierto = (energiaUtilizada / consumo) * 100;
 
-  
-
   mostrarResultados({
     municipio,
     horasSol,
@@ -200,7 +205,8 @@ function manejarFormulario(event) {
   });
   graficarBarras(costoSinPaneles, costoConPaneles, ahorroTotal);
   graficarPastel(energiaUtilizada, consumo);
-  mostrarRecomendaciones(porcentajeCubierto, eficienciaPanel);
+  mostrarRecomendaciones(porcentajeCubierto, eficienciaPanel, consumo, energiaGenerada);
+
 }
 
 // Inicialización
