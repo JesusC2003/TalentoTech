@@ -1,26 +1,29 @@
 let datosCSV = [];
-const eficienciaPanel = 0.20; // 20% de eficiencia de los paneles solares
-const horasSolPorMunicipio = {
-  Valledupar:6.2,
-  Aguachica:5.8,
-  Codazzi:6.1,
-  La_Jagua_Ibirico:6.0,
-  Bosconia:5.9,
-  Chimichagua:6.0,
-  Curumaní:5.9,
-  El_Copey:5.7,
-  Pueblo_Bello:5.7,
-  San_Alberto:6.0
-};
+let datosMunicipios = [];
+const eficienciaPanel = 0.20;
 
 let graficoBarras, graficoPastel;
 
+// Cargar tarifas por estrato
 fetch('datos/datos_consumo_tarifas.csv')
   .then(response => response.text())
   .then(text => {
     const parsed = Papa.parse(text, { header: true, dynamicTyping: true });
     datosCSV = parsed.data.filter(fila => fila.Estrato);
   });
+
+// Cargar horas de sol por municipio
+function cargarHorasSolPorMunicipio() {
+  fetch('datos/datos_horas_municipio.csv')
+    .then(response => response.text())
+    .then(text => {
+      const parsed = Papa.parse(text, { header: true, dynamicTyping: true });
+      datosMunicipios = parsed.data.filter(fila => fila.Municipio && fila.Horas_Sol);
+    });
+}
+
+// Llamar la función al iniciar
+cargarHorasSolPorMunicipio();
 
 document.getElementById("formulario").addEventListener("submit", function (e) {
   e.preventDefault();
@@ -29,10 +32,13 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
   const estrato = parseInt(document.getElementById("estrato").value);
   const municipio = document.getElementById("municipio").value;
 
-  if (!horasSolPorMunicipio[municipio]) {
-    alert("Municipio no válido.");
+  const filaMunicipio = datosMunicipios.find(m => m.Municipio === municipio);
+  if (!filaMunicipio) {
+    alert("Municipio no válido o no cargado.");
     return;
   }
+
+  const horasSol = parseFloat(filaMunicipio.Horas_Sol);
 
   const fila = datosCSV.find(f => parseInt(f.Estrato) === estrato);
   if (!fila) {
@@ -41,19 +47,15 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
   }
 
   const tarifa = parseFloat(fila.Tarifa_kWh);
-  const horasSol = horasSolPorMunicipio[municipio];
-  const precioVenta = tarifa * 0.8; // pago por excedente: 80% de la tarifa
 
   const energiaGenerada = horasSol * eficienciaPanel * 30; // kWh al mes
   const energiaUtilizada = Math.min(energiaGenerada, consumo);
-  const excedente = Math.max(energiaGenerada - consumo, 0);
 
   const ahorroPorUso = energiaUtilizada * tarifa;
-  const ingresoPorExcedente = excedente * precioVenta;
-  const ahorroTotal = ahorroPorUso + ingresoPorExcedente;
 
   const costoSinPaneles = consumo * tarifa;
   const costoConPaneles = (consumo - energiaUtilizada) * tarifa;
+  const ahorroTotal = ahorroPorUso;
 
   const porcentajeCubierto = (energiaUtilizada / consumo) * 100;
 
@@ -63,8 +65,6 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
 
 - Generarías ${energiaGenerada.toFixed(2)} kWh/mes.
 - Ahorras $${ahorroPorUso.toFixed(0)} COP al reemplazar energía de la red.
-- Vendes ${excedente.toFixed(2)} kWh extra por $${ingresoPorExcedente.toFixed(0)} COP.
-- Tu beneficio total es de $${ahorroTotal.toFixed(0)} COP al mes.
 - Tu nuevo costo mensual sería de $${costoConPaneles.toFixed(0)} COP.
 - Estás cubriendo aproximadamente el ${porcentajeCubierto.toFixed(1)}% de tu consumo.`;
 
@@ -74,11 +74,11 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
   graficoBarras = new Chart(ctxBarras, {
     type: 'bar',
     data: {
-      labels: ['Sin paneles', 'Ahorro por uso', 'Ingreso por excedente'],
+      labels: ['Sin paneles', 'Con paneles', 'Ahorro'],
       datasets: [{
         label: 'Valor en COP',
-        data: [costoSinPaneles, ahorroPorUso, ingresoPorExcedente],
-        backgroundColor: ['#e74c3c', '#2ecc71', '#3498db']
+        data: [costoSinPaneles, costoConPaneles, ahorroTotal],
+        backgroundColor: ['#e74c3c', '#3498db', '#2ecc71']
       }]
     },
     options: {
