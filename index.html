@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simulador de Ahorro Solar</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Simulador de Ahorro con Paneles Solares</h1>
+    <form id="formulario">
+      <label>Consumo mensual (kWh): <input type="number" id="consumo" required /></label>
+      <label>Estrato:
+        <select id="estrato" required>
+          <option value="">Seleccione</option>
+          <option value="1">Estrato 1</option>
+          <option value="2">Estrato 2</option>
+          <option value="3">Estrato 3</option>
+        </select>
+      </label>
+      <label>Municipio:
+        <select id="municipio" required>
+          <option value="">Seleccione</option>
+          <option value="Valledupar">Valledupar</option>
+          <option value="Bogotá">Bogotá</option>
+          <option value="Medellín">Medellín</option>
+          <option value="Bosconia">Bosconia</option>
+          <option value="Barranquilla">Barranquilla</option>
+          <option value="Santa_Marta">Santa Marta</option>
+        </select>
+      </label>
+      <button type="submit">Calcular Ahorro</button>
+    </form>
+
+    <section id="resultado">
+        <h2>Resultado</h2>
+        <p id="texto-resultado"></p>
+
+        <h3>Comparación de costo mensual (COP)</h3>
+        <canvas id="graficoBarras" width="400" height="200"></canvas>
+
+        <h3>Porcentaje de consumo cubierto por energía solar</h3>
+        <canvas id="graficoPastel" width="400" height="200"></canvas>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
