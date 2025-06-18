@@ -1,18 +1,16 @@
 let datosCSV = [];
 let datosMunicipios = [];
-const eficienciaPanel = 0.20;
-
 let graficoBarras, graficoPastel;
 
-// Cargar tarifas por estrato
-fetch('datos/datos_consumo_tarifas.csv')
-  .then(response => response.text())
-  .then(text => {
-    const parsed = Papa.parse(text, { header: true, dynamicTyping: true });
-    datosCSV = parsed.data.filter(fila => fila.Estrato);
-  });
+function cargarTarifasPorEstrato() {
+  fetch('datos/datos_consumo_tarifas.csv')
+    .then(response => response.text())
+    .then(text => {
+      const parsed = Papa.parse(text, { header: true, dynamicTyping: true });
+      datosCSV = parsed.data.filter(fila => fila.Estrato);
+    });
+}
 
-// Cargar horas de sol por municipio
 function cargarHorasSolPorMunicipio() {
   fetch('datos/datos_horas_municipio.csv')
     .then(response => response.text())
@@ -22,53 +20,37 @@ function cargarHorasSolPorMunicipio() {
     });
 }
 
-// Llamar la función al iniciar
-cargarHorasSolPorMunicipio();
-
-document.getElementById("formulario").addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const consumo = parseFloat(document.getElementById("consumo").value);
-  const estrato = parseInt(document.getElementById("estrato").value);
-  const municipio = document.getElementById("municipio").value;
-
+function obtenerHorasSol(municipio) {
   const filaMunicipio = datosMunicipios.find(m => m.Municipio === municipio);
-  if (!filaMunicipio) {
-    alert("Municipio no válido o no cargado.");
-    return;
-  }
+  return filaMunicipio ? parseFloat(filaMunicipio.Horas_Sol) : null;
+}
 
-  const horasSol = parseFloat(filaMunicipio.Horas_Sol);
-
+function obtenerTarifa(estrato) {
   const fila = datosCSV.find(f => parseInt(f.Estrato) === estrato);
-  if (!fila) {
-    alert("No se encontraron datos para el estrato seleccionado.");
-    return;
-  }
+  return fila ? parseFloat(fila.Tarifa_kWh) : null;
+}
 
-  const tarifa = parseFloat(fila.Tarifa_kWh);
-
-  const energiaGenerada = horasSol * eficienciaPanel * 30; // kWh al mes
-  const energiaUtilizada = Math.min(energiaGenerada, consumo);
-
-  const ahorroPorUso = energiaUtilizada * tarifa;
-
-  const costoSinPaneles = consumo * tarifa;
-  const costoConPaneles = (consumo - energiaUtilizada) * tarifa;
-  const ahorroTotal = ahorroPorUso;
-
-  const porcentajeCubierto = (energiaUtilizada / consumo) * 100;
-
-  // Texto explicativo
+function mostrarResultados({
+  municipio,
+  horasSol,
+  eficienciaPanel,
+  energiaGenerada,
+  ahorroPorUso,
+  costoConPaneles,
+  porcentajeCubierto,
+  costoSinPaneles
+}) {
   document.getElementById("texto-resultado").innerText =
-    `En ${municipio}, con ${horasSol} h de sol al día y eficiencia del 20%:
+    `En ${municipio}, con ${horasSol} h de sol al día y eficiencia del ${eficienciaPanel * 100}%:
 
+- Tu factura sin paneles sería de $${costoSinPaneles.toFixed(0)} COP.
 - Generarías ${energiaGenerada.toFixed(2)} kWh/mes.
 - Ahorras $${ahorroPorUso.toFixed(0)} COP al reemplazar energía de la red.
 - Tu nuevo costo mensual sería de $${costoConPaneles.toFixed(0)} COP.
 - Estás cubriendo aproximadamente el ${porcentajeCubierto.toFixed(1)}% de tu consumo.`;
+}
 
-  // Gráfico de barras: comparación económica
+function graficarBarras(costoSinPaneles, costoConPaneles, ahorroTotal) {
   const ctxBarras = document.getElementById("graficoBarras").getContext("2d");
   if (graficoBarras) graficoBarras.destroy();
   graficoBarras = new Chart(ctxBarras, {
@@ -96,8 +78,9 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
       }
     }
   });
+}
 
-  // Gráfico pastel: porcentaje de cobertura
+function graficarPastel(energiaUtilizada, consumo) {
   const ctxPastel = document.getElementById("graficoPastel").getContext("2d");
   if (graficoPastel) graficoPastel.destroy();
   graficoPastel = new Chart(ctxPastel, {
@@ -125,4 +108,53 @@ document.getElementById("formulario").addEventListener("submit", function (e) {
       }
     }
   });
-});
+}
+
+function manejarFormulario(event) {
+  event.preventDefault();
+
+  const consumo = parseFloat(document.getElementById("consumo").value);
+  const estrato = parseInt(document.getElementById("estrato").value);
+  const municipio = document.getElementById("municipio").value;
+  const eficienciaPanel = parseFloat(document.getElementById("panel").value);
+
+  const horasSol = obtenerHorasSol(municipio);
+  if (horasSol === null) {
+    alert("Municipio no válido o no cargado.");
+    return;
+  }
+
+  const tarifa = obtenerTarifa(estrato);
+  if (tarifa === null) {
+    alert("No se encontraron datos para el estrato seleccionado.");
+    return;
+  }
+
+  const energiaGenerada = horasSol * eficienciaPanel * 30;
+  const energiaUtilizada = Math.min(energiaGenerada, consumo);
+  const ahorroPorUso = energiaUtilizada * tarifa;
+
+  const costoSinPaneles = consumo * tarifa;
+  const costoConPaneles = (consumo - energiaUtilizada) * tarifa;
+  const ahorroTotal = ahorroPorUso;
+  const porcentajeCubierto = (energiaUtilizada / consumo) * 100;
+
+  mostrarResultados({
+    municipio,
+    horasSol,
+    eficienciaPanel,
+    energiaGenerada,
+    ahorroPorUso,
+    costoConPaneles,
+    porcentajeCubierto,
+    costoSinPaneles
+  });
+
+  graficarBarras(costoSinPaneles, costoConPaneles, ahorroTotal);
+  graficarPastel(energiaUtilizada, consumo);
+}
+
+// Inicialización
+cargarTarifasPorEstrato();
+cargarHorasSolPorMunicipio();
+document.getElementById("formulario").addEventListener("submit", manejarFormulario);
